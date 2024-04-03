@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
+import { TimerContext } from "../contexts/TimerContext";
 
 const CountdownTimer = () => {
+  const { isTimerStart, setTimerStart } = useContext(TimerContext);
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+  };
+
   return (
     <div className="flex justify-center gap-12 items-center flex-col bg-white p-10">
       <h1 className="text-3xl font-bold">Countdown Timer</h1>
       <form
-        onSubmit={() => {}}
+        onSubmit={onSubmit}
         className="flex flex-col gap-5 justify-center items-center"
       >
         <label htmlFor="datetime">
@@ -19,12 +26,23 @@ const CountdownTimer = () => {
         </label>
 
         <div className="flex gap-5">
-          <button className="p-2.5 text-white bg-violet-900 hover:bg-violet-800">
-            Start Timer
-          </button>
-          <button className="p-2.5 text-white bg-violet-900 hover:bg-violet-800">
-            Cancel Timer
-          </button>
+          {!isTimerStart ? (
+            <button
+              type="submit"
+              className="p-2.5 text-white bg-violet-900 hover:bg-violet-800"
+              onClick={() => setTimerStart(!isTimerStart)}
+            >
+              Start Timer
+            </button>
+          ) : (
+            <button
+              type="submit"
+              className="p-2.5 text-white bg-violet-900 hover:bg-violet-800"
+              onClick={() => setTimerStart(!isTimerStart)}
+            >
+              Cancel Timer
+            </button>
+          )}
         </div>
       </form>
 
