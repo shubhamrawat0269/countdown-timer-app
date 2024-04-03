@@ -2,7 +2,7 @@ import CountdownTimer from "./components/CountdownTimer";
 
 function App() {
   return (
-    <div className="primary__bg w-screen h-screen flex justify-center items-center">
+    <div className="bg-violet-900 grid place-content-center h-screen">
       <CountdownTimer />
     </div>
   );
