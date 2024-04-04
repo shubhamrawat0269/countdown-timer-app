@@ -1,6 +1,5 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { TimerContext } from "../contexts/TimerContext";
-import { getTime } from "../utils";
 
 const CountdownTimer = () => {
   const {
@@ -12,33 +11,35 @@ const CountdownTimer = () => {
     minutes,
     seconds,
     days,
-    setDays,
-    setSeconds,
-    setHours,
-    setMinutes,
+    stopTimer,
     error,
+    isBtnClicked,
+    setBtnClicked,
+    resetTimerToZero,
+    setTimerStart,
+    statement,
   } = useContext(TimerContext);
+  let userGivenTimeRef = useRef(null);
 
   const onSubmit = (e) => {
     e.preventDefault();
 
-    const userGivenTime = new Date(inputTime);
-    const curr_time = new Date();
-
-    const userGivenTimeINMilliSec = userGivenTime.getTime();
-    const currTimeINMilliSec = curr_time.getTime();
-    const reqTimeDiff = userGivenTimeINMilliSec - currTimeINMilliSec;
-
-    if (reqTimeDiff > 0) {
-      const { seconds, minutes, hours, days } = getTime(reqTimeDiff);
-      setDays(days);
-      setSeconds(seconds);
-      setHours(hours);
-      setMinutes(minutes);
-
-      // handleTimer(seconds, minutes, hours, days);
+    userGivenTimeRef.current = new Date(inputTime);
+    if (isBtnClicked) {
+      resetTimerToZero();
+      setTimerStart(!isTimerStart);
+      setInputTime("");
+    } else {
+      setBtnClicked(!isBtnClicked);
     }
   };
+
+  useEffect(() => {
+    if (isBtnClicked) {
+      handleTimer(userGivenTimeRef.current);
+    }
+    return () => stopTimer();
+  }, [isBtnClicked]);
 
   return (
     <div className="flex justify-center gap-12 items-center flex-col bg-white p-10">
@@ -64,7 +65,6 @@ const CountdownTimer = () => {
             <button
               type="submit"
               className="p-2.5 text-white bg-violet-900 hover:bg-violet-800"
-              onClick={() => {}}
             >
               Start Timer
             </button>
@@ -72,7 +72,6 @@ const CountdownTimer = () => {
             <button
               type="submit"
               className="p-2.5 text-white bg-violet-900 hover:bg-violet-800"
-              onClick={() => {}}
             >
               Cancel Timer
             </button>
@@ -85,20 +84,24 @@ const CountdownTimer = () => {
         )}
       </form>
 
-      <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-4">
-        <div className="flex justify-center gap-2 items-center rounded-xl md:flex-col bg-violet-800 hover:bg-violet-900 text-white p-5 w-40">
-          <span className="font-bold text-4xl">{days}</span> Days
+      {statement.length > 0 ? (
+        <p className="text-green-800 text-center">{statement}</p>
+      ) : (
+        <div className="grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-4">
+          <div className="flex justify-center gap-2 items-center rounded-xl md:flex-col bg-violet-800 hover:bg-violet-900 text-white p-5 w-40">
+            <span className="font-bold text-4xl">{days}</span> Days
+          </div>
+          <div className="flex justify-center gap-2 items-center  rounded-xl  md:flex-col bg-violet-800 hover:bg-violet-900 text-white p-5 w-40">
+            <span className="font-bold text-4xl">{hours}</span> Hours
+          </div>
+          <div className="flex justify-center gap-2 items-center rounded-xl  md:flex-col bg-violet-800 hover:bg-violet-900 text-white p-5 w-40">
+            <span className="font-bold text-4xl">{minutes}</span> Minutes
+          </div>
+          <div className="flex justify-center gap-2 items-center rounded-xl  md:flex-col bg-violet-800 hover:bg-violet-900 text-white p-5 w-40">
+            <span className="font-bold text-4xl">{seconds}</span> Seconds
+          </div>
         </div>
-        <div className="flex justify-center gap-2 items-center  rounded-xl  md:flex-col bg-violet-800 hover:bg-violet-900 text-white p-5 w-40">
-          <span className="font-bold text-4xl">{hours}</span> Hours
-        </div>
-        <div className="flex justify-center gap-2 items-center rounded-xl  md:flex-col bg-violet-800 hover:bg-violet-900 text-white p-5 w-40">
-          <span className="font-bold text-4xl">{minutes}</span> Minutes
-        </div>
-        <div className="flex justify-center gap-2 items-center rounded-xl  md:flex-col bg-violet-800 hover:bg-violet-900 text-white p-5 w-40">
-          <span className="font-bold text-4xl">{seconds}</span> Seconds
-        </div>
-      </div>
+      )}
     </div>
   );
 };

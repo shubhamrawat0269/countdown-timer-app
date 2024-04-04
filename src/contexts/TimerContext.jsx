@@ -1,58 +1,54 @@
 import { createContext, useRef, useState } from "react";
+import { getTime } from "../utils";
 
 const TimerContext = createContext();
 
 const TimerProvider = ({ children }) => {
   const [isTimerStart, setTimerStart] = useState(false);
-  const [inputTime, setInputTime] = useState(0);
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
+  const [isBtnClicked, setBtnClicked] = useState(false);
+  const [inputTime, setInputTime] = useState("00");
+  const [hours, setHours] = useState("00");
+  const [minutes, setMinutes] = useState("00");
+  const [seconds, setSeconds] = useState("00");
   const [days, setDays] = useState(0);
   const [error, setError] = useState("");
-  const timerRef = useRef(null);
-
-  function resetTimeToZero() {
-    setDays(0);
-    setHours(0);
-    setMinutes(0);
-    setSeconds(0);
-  }
+  const [statement, setStatement] = useState("");
+  let timerRef = useRef(null);
 
   function stopTimer() {
     clearInterval(timerRef.current);
   }
 
-  const handleTimer = (seconds, minutes, hours, days) => {
-    // validation check
-    if (seconds <= 59 && minutes <= 59 && hours <= 23 && days <= 99) {
-      console.log({ seconds, minutes, hours, days });
-      timerRef.current = setInterval(() => {
-        timer();
-      }, 1000);
-    } else {
-      setError("Selected Time is more than 100 days");
-    }
-  };
-
-  function timer() {
-    if (days == 0 && hours == 0 && minutes == 0 && seconds == 0) {
-      resetTimeToZero();
-      stopTimer();
-    } else if (seconds != 0) {
-      setSeconds((preVal) => preVal - 1);
-    } else if (minutes != 0 && seconds == 0) {
-      setSeconds("59");
-      setMinutes((preVal) => preVal - 1);
-    } else if (hours != 0 && minutes == 0) {
-      setMinutes("60");
-      setHours((preVal) => preVal - 1);
-    } else if (days != 0 && hours == 0) {
-      setHours("23");
-      setDays((preVal) => preVal - 1);
-    }
-    setTimerStart(!isTimerStart);
+  function resetTimerToZero() {
+    setDays("00");
+    setHours("00");
+    setMinutes("00");
+    setSeconds("00");
+    stopTimer();
   }
+
+  const handleTimer = (userGivenTime) => {
+    const userGivenTimeInMilliSec = userGivenTime.getTime();
+    timerRef.current = setInterval(() => {
+      const currTimeInMilliSec = new Date().getTime();
+      const timeDifference = userGivenTimeInMilliSec - currTimeInMilliSec;
+      const { d, s, m, h } = getTime(timeDifference);
+      if (d < 100) {
+        if (timeDifference < 0) {
+          stopTimer();
+          setStatement("The countdown is over! What's next on your adventure");
+        } else {
+          setTimerStart(!isTimerStart);
+          setDays(d);
+          setHours(h);
+          setMinutes(m);
+          setSeconds(s);
+        }
+      } else {
+        setError("The selected days is more than 100 days");
+      }
+    }, 1000);
+  };
 
   const context = {
     inputTime,
@@ -62,6 +58,9 @@ const TimerProvider = ({ children }) => {
     seconds,
     days,
     error,
+    isBtnClicked,
+    resetTimerToZero,
+    setBtnClicked,
     setDays,
     setSeconds,
     setHours,
@@ -69,6 +68,8 @@ const TimerProvider = ({ children }) => {
     setTimerStart,
     setInputTime,
     handleTimer,
+    stopTimer,
+    statement,
   };
 
   return (

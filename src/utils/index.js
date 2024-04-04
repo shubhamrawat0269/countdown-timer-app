@@ -7,9 +7,9 @@ export const getTime = (timestamp) => {
   const days = Math.floor(hrs / 24);
 
   return {
-    days: days,
-    seconds: sec % 60,
-    minutes: min % 60,
-    hours: hrs % 24,
+    d: days,
+    s: sec % 60,
+    m: min % 60,
+    h: hrs % 24,
   };
 };
