@@ -1,11 +1,25 @@
 import React, { useContext } from "react";
 import { TimerContext } from "../contexts/TimerContext";
+import { getTime } from "../utils";
 
 const CountdownTimer = () => {
-  const { isTimerStart, setTimerStart } = useContext(TimerContext);
+  const { isTimerStart, setTimerStart, inputTime, setInputTime } =
+    useContext(TimerContext);
 
   const onSubmit = (e) => {
     e.preventDefault();
+
+    const userGivenTime = new Date(inputTime);
+    const curr_time = new Date();
+    // console.log(userGivenTime);
+    // console.log(curr_time);
+    const userGivenTimeINMilliSec = userGivenTime.getTime();
+    const currTimeINMilliSec = curr_time.getTime();
+    const reqTimeDiff = userGivenTimeINMilliSec - currTimeINMilliSec;
+    if (reqTimeDiff > 0) {
+      const { seconds, minutes, hours, days } = getTime(reqTimeDiff);
+      console.log({ seconds, minutes, hours, days });
+    }
   };
 
   return (
@@ -17,11 +31,13 @@ const CountdownTimer = () => {
       >
         <label htmlFor="datetime">
           <input
+            id="datetime"
+            name="datetime"
+            autoCapitalize="off"
+            value={inputTime}
+            onChange={(e) => setInputTime(e.target.value)}
             type="datetime-local"
             className=" p-2 outline-none rounded-lg border-2 border-slate-300"
-            name="datetime"
-            id="datetime"
-            autoCapitalize="off"
           />
         </label>
 
